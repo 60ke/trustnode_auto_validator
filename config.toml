@@ -1,0 +1,45 @@
+[tm]
+  [[hosts]]
+    ip = "106.3.133.178"
+    isNew = false
+
+  [[hosts]]
+    ip = "106.3.133.179"
+    isNew = false
+
+  [[hosts]]
+    ip = "106.3.133.180"
+    isNew = false
+
+  [[hosts]]
+    ip = "210.73.218.171"
+    isNew = false
+
+  [[hosts]]
+    ip = "210.73.218.172"
+    isNew = false
+
+[bsc]
+  [[hosts]]
+    ip = "106.3.133.178"
+    isNew = false
+
+  [[hosts]]
+    ip = "106.3.133.179"
+    isNew = false
+
+  [[hosts]]
+    ip = "106.3.133.180"
+    isNew = false
+
+  [[hosts]]
+    ip = "210.73.218.171"
+    isNew = false
+
+  [[hosts]]
+    ip = "210.73.218.172"
+    isNew = false
+
+
+[server]
+  token = "3D3781351A3EE9E4"
