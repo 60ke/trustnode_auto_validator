@@ -1,44 +1,44 @@
-[tm]
-  [[hosts]]
-    ip = "106.3.133.178"
-    isNew = false
 
-  [[hosts]]
-    ip = "106.3.133.179"
-    isNew = false
+[[tm]]
+  ip = "106.3.133.178"
+  isNew = false
 
-  [[hosts]]
-    ip = "106.3.133.180"
-    isNew = false
+[[tm]]
+  ip = "106.3.133.179"
+  isNew = false
 
-  [[hosts]]
-    ip = "210.73.218.171"
-    isNew = false
+[[tm]]
+  ip = "106.3.133.180"
+  isNew = false
 
-  [[hosts]]
-    ip = "210.73.218.172"
-    isNew = false
+[[tm]]
+  ip = "210.73.218.171"
+  isNew = false
 
-[bsc]
-  [[hosts]]
-    ip = "106.3.133.178"
-    isNew = false
+[[tm]]
+  ip = "210.73.218.172"
+  isNew = false
 
-  [[hosts]]
-    ip = "106.3.133.179"
-    isNew = false
 
-  [[hosts]]
-    ip = "106.3.133.180"
-    isNew = false
+[[bsc]]
+  ip = "106.3.133.178"
+  isNew = false
 
-  [[hosts]]
-    ip = "210.73.218.171"
-    isNew = false
+[[bsc]]
+  ip = "106.3.133.179"
+  isNew = false
 
-  [[hosts]]
-    ip = "210.73.218.172"
-    isNew = false
+[[bsc]]
+  ip = "106.3.133.180"
+  isNew = false
+
+[[bsc]]
+  ip = "210.73.218.171"
+  isNew = false
+
+[[bsc]]
+  ip = "210.73.218.172"
+  isNew = false
 
 
 [server]
