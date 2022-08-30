@@ -40,8 +40,14 @@ jobs:
     - name: Packaging...
       run: tar czf nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz nodeUpgrade
     - name: Gets latest created release info
-      id: latest_release_info
-      uses: jossef/action-latest-release-info@v1.1.0      
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            ./nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz  
     - name: Uploading assets...
       # if: ${{ !env.ACT }}
       # id: upload-release-asset 
