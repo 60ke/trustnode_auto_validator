@@ -35,28 +35,18 @@ jobs:
         GOARCH: ${{ matrix.goarch }}            
     - name: Packaging...
       run: tar czf nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz nodeUpgrade
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-      with:
-        tag_name: ${{ github.head_ref }}
-        release_name: Release ${{ github.head_ref }}
-        body: |
-          Changes in this Release
-          - First Change
-          - Second Change
-        draft: false
-        prerelease: false        
+    - id: release
+      uses: rymndhng/release-on-push-action@master
+        with:
+          bump_version_scheme: minor       
     - name: Uploading assets...
       # if: ${{ !env.ACT }}
       # id: upload-release-asset 
       uses: actions/upload-release-asset@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GOACTION }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        upload_url: ${{ steps.release.outputs.upload_url }}
         asset_path: ./nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
         asset_name: nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
         asset_content_type: application/gzip
