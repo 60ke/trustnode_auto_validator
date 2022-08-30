@@ -41,9 +41,11 @@ jobs:
       run: tar czf nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz nodeUpgrade
     - name: Gets latest created release info
       uses: "marvinpinto/action-automatic-releases@latest"
+      env:
+        TAG: ${{ github.head_ref }}
       with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag:  ${{ github.head_ref }}
+          automatic_release_tag:  ${{ env.TAG }}
           prerelease: true
           title: "Development Build"
           files: |
