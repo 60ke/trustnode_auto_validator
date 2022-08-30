@@ -82,7 +82,7 @@ func GetTmPK(ip string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	data := "192.168.1.227/" + fmt.Sprintf("%X", pubStr) + "/100"
+	data := ip + "/" + fmt.Sprintf("%X", pubStr) + "/100"
 	return data, nil
 }
 
@@ -129,10 +129,12 @@ func GenMap(ips []string) (BscTmMap, error) {
 		}
 		tmAddr, err := GetTmAddr(ip)
 		if err != nil {
+			Logger.Error(err)
 			return BscTmMap{}, err
 		}
 		bscAddr, err := GetBscAddr(ip)
 		if err != nil {
+			Logger.Error(err)
 			return BscTmMap{}, err
 		}
 		btm.TmNodePubkeyAddr = tmAddr
@@ -150,20 +152,27 @@ func GenMap(ips []string) (BscTmMap, error) {
 
 // 添加验证者
 func PostNode(ips []string, bscTmMap BscTmMap, retrytimes int) []string {
+	Logger.Info("start add bsc to:", strings.Join(ips, ","))
 	var toPost []string
 	toPost = ips
 	var retry int
-	for len(toPost) != 0 || retry < retrytimes {
+	for len(toPost) != 0 && retry < retrytimes {
 		var failures []string
 		for _, ip := range toPost {
 			url := "http://" + ip + ":6666" + "/upgrade/addvalidatorv2"
 			num := len(bscTmMap.BscPubkeyAddrMaps)
-			json_str, _ := json.Marshal(bscTmMap)
-			payload := strings.NewReader(fmt.Sprintf(`{"AccessToken":%s,"bscTMPubkeyPairs": %s, "pubkeyNum": %d}`, Conf.Server.Token, string(json_str), num))
-			_, err := post(url, payload)
+			json_str, _ := json.Marshal(bscTmMap.BscPubkeyAddrMaps)
+			Logger.Info(string(json_str))
+			payload := strings.NewReader(fmt.Sprintf(`{"AccessToken":"%s","bscTMPubkeyPairs": %s, "pubkeyNum": %d}`, Conf.Server.Token, string(json_str), num))
+			ret, err := post(url, payload)
 			if err != nil {
+				Logger.Error("add bsc failed,ip : ", ip, ",retry.")
 				failures = append(failures, ip)
 			}
+			if !strings.Contains(string(ret), "调用成功") {
+				failures = append(failures, ip)
+			}
+			Logger.Info("add bsc to ", ip, " succ:", string(ret))
 		}
 		toPost = failures
 		retry += 1

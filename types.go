@@ -74,7 +74,7 @@ type BTM struct {
 }
 
 type BscTmMap struct {
-	BscPubkeyAddrMaps []BTM `json:"bsc_pubkey_addr_maps"`
+	BscPubkeyAddrMaps []BTM `json:"bscTMPubkeyPairs"`
 	WebPort           int   `json:"WebPort"`
 }
 
