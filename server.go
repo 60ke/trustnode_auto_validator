@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var Version string
+
 type IPData struct {
 	IPs    []string `json:"ips"`
 	Type   string   `json:"type"` //tm or bsc or all
@@ -161,6 +163,8 @@ func GetValidators(c *gin.Context) {
 }
 
 func Server() {
+	fmt.Printf("Version: %s\n", Version)
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.POST("/add_validators", AddValidators)
 	r.GET("/get_validators", GetValidators)
