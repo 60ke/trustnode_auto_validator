@@ -1,10 +1,14 @@
 name: Publish Go Binary
 
 # 触发条件：在 push 到 main 分支后
+# on:
+#   push:
+#     branches:
+#       - main
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+    - created
 jobs:
   buildAndDeploy:
     runs-on:  ubuntu-latest
@@ -23,12 +27,7 @@ jobs:
           - goarch: arm64
             goos: darwin
     # 使用checkout
-    steps:
-    - id: release
-      uses: rymndhng/release-on-push-action@master
-      with:
-        bump_version_scheme: minor
-        tag_prefix: v    
+    steps:  
     - uses: actions/checkout@v3
     - name: Set up Go
       uses: actions/setup-go@v3
@@ -49,7 +48,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GOACTION }}
       with:
-        upload_url: ${{ steps.release.outputs.upload_url }}
+        upload_url: ${{ github.event.release.upload_url }}
         asset_path: ./nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
         asset_name: nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
         asset_content_type: application/gzip
