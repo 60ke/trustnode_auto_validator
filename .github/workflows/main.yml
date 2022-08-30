@@ -8,6 +8,8 @@ on:
 jobs:
   buildAndDeploy:
     runs-on:  ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     # 交叉构建,多平台交叉编译
     strategy:
       matrix:
