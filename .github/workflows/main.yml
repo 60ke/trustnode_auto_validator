@@ -1,14 +1,12 @@
 name: Publish Go Binary
 
 # 触发条件：在 push 到 main 分支后
-# on:
-#   push:
-#     branches:
-#       - main
 on:
-  release:
-    types:
-    - created
+  push:
+    branches:
+      - main
+env:
+  GITHUB_TOKEN: ${{ secrets.GOACTION }}      
 jobs:
   buildAndDeploy:
     runs-on:  ubuntu-latest
@@ -27,7 +25,7 @@ jobs:
           - goarch: arm64
             goos: darwin
     # 使用checkout
-    steps:  
+    steps:
     - uses: actions/checkout@v3
     - name: Set up Go
       uses: actions/setup-go@v3
@@ -40,7 +38,10 @@ jobs:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}            
     - name: Packaging...
-      run: tar czf nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz nodeUpgrade     
+      run: tar czf nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz nodeUpgrade
+    - name: Gets latest created release info
+      id: latest_release_info
+      uses: jossef/action-latest-release-info@v1.1.0      
     - name: Uploading assets...
       # if: ${{ !env.ACT }}
       # id: upload-release-asset 
@@ -48,7 +49,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GOACTION }}
       with:
-        upload_url: ${{ github.event.release.upload_url }}
+        upload_url: ${{ steps.latest_release_info.outputs.upload_url }}
         asset_path: ./nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
         asset_name: nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
         asset_content_type: application/gzip
