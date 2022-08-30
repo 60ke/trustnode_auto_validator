@@ -24,6 +24,11 @@ jobs:
             goos: darwin
     # 使用checkout
     steps:
+    - id: release
+      uses: rymndhng/release-on-push-action@master
+      with:
+        bump_version_scheme: minor
+        tag_prefix: v    
     - uses: actions/checkout@v3
     - name: Set up Go
       uses: actions/setup-go@v3
@@ -36,14 +41,7 @@ jobs:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}            
     - name: Packaging...
-      run: tar czf nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz nodeUpgrade
-    - name: release
-      id: release
-      uses: rymndhng/release-on-push-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GOACTION }}      
-      with:
-          bump_version_scheme: minor       
+      run: tar czf nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz nodeUpgrade     
     - name: Uploading assets...
       # if: ${{ !env.ACT }}
       # id: upload-release-asset 
