@@ -35,6 +35,20 @@ jobs:
         GOARCH: ${{ matrix.goarch }}            
     - name: Packaging...
       run: tar czf nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz nodeUpgrade
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GOACTION }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+          - First Change
+          - Second Change
+        draft: false
+        prerelease: false        
     - name: Uploading assets...
       # if: ${{ !env.ACT }}
       # id: upload-release-asset 
