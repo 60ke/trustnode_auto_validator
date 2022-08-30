@@ -35,9 +35,10 @@ jobs:
         GOARCH: ${{ matrix.goarch }}            
     - name: Packaging...
       run: tar czf nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz nodeUpgrade
-    - id: release
+    - name: release
+      id: release
       uses: rymndhng/release-on-push-action@master
-        with:
+      with:
           bump_version_scheme: minor       
     - name: Uploading assets...
       # if: ${{ !env.ACT }}
