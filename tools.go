@@ -137,6 +137,7 @@ func GenMap(ips []string) (BscTmMap, error) {
 			Logger.Error(err)
 			return BscTmMap{}, err
 		}
+		tmAddr = strings.ToLower(tmAddr)
 		btm.TmNodePubkeyAddr = tmAddr
 		btm.BscNodePubkeyAddr = bscAddr
 		bscTmMap.BscPubkeyAddrMaps = append(bscTmMap.BscPubkeyAddrMaps, btm)

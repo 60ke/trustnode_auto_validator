@@ -19,7 +19,6 @@
   ip = "210.73.218.172"
   isNew = false
 
-
 [[bsc]]
   ip = "106.3.133.178"
   isNew = false
@@ -40,6 +39,9 @@
   ip = "210.73.218.172"
   isNew = false
 
+[[bsc]]
+  ip = "101.251.223.190"
+  isNew = false
 
 [server]
   token = "3D3781351A3EE9E4"
