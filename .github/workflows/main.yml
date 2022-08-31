@@ -45,7 +45,7 @@ jobs:
         TAG: "ffff"
       with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag:  ${{ env.TAG }}
+#           automatic_release_tag:  ${{ env.TAG }}
           prerelease: true
           title: "Development Build"
           files: |
