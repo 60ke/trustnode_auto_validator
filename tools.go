@@ -8,12 +8,14 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func get(url string) ([]byte, error) {
 	// url := "http://106.3.133.179:46657/tri_block_info?height=104360"
 
 	client := &http.Client{}
+	client.Timeout = time.Second * 5
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
@@ -91,10 +93,10 @@ func SendTmTx(ip string, node string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	url := "http://" + ip + "tri_broadcast_tx_commit/?tx=\"[addvalidator]val:" + data + "\""
-	Logger.Debug(url)
-	return nil, nil
-	// return get(url)
+	url := "http://" + ip + ":46657/tri_broadcast_tx_commit?tx=\"[addvalidator]val:" + data + "\""
+	Logger.Debug("send TmTx:", url)
+
+	return get(url)
 	// ret, err := get(url)
 	// Logger.Info(string(ret))
 	// if err != nil {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -63,16 +64,23 @@ func addTm(newIp string) error {
 		Logger.Error(err)
 		return err
 	}
-
+	// Logger.Info(Conf)
 	newConf := Conf
 	host := Host{
 		Ip:    newIp,
 		IsNew: false,
 	}
 	newConf.TM = append(newConf.TM, host)
-	_, err := SendTmTx(ips[0], newIp)
+	var tmErrResult TmTxErrResult
+	ret, err := SendTmTx(newConf.TmServer, newIp)
 	if err != nil {
 		return err
+	}
+
+	// 如果序列化成功表明tx交易有错误返回
+	tmErr := json.Unmarshal(ret, &tmErrResult)
+	if tmErr == nil {
+		return fmt.Errorf(string(ret))
 	}
 	Conf = newConf
 	err = SaveConf(Conf)
@@ -105,18 +113,19 @@ func AddValidators(c *gin.Context) {
 			}
 		}
 		if len(bscfails) != 0 {
-			c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip add failed: " + strings.Join(bscfails, ",")})
+			c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addbsc failed: " + strings.Join(bscfails, ",")})
 			return
 		}
 	case "tm":
 		for _, ip := range ipdata.IPs {
 			err := addTm(ip)
 			if err != nil {
+				Logger.Error("addTm err:", err)
 				tmfails = append(tmfails, ip)
 			}
 		}
 		if len(tmfails) != 0 {
-			c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip add failed: " + strings.Join(tmfails, ",")})
+			c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addtm failed: " + strings.Join(tmfails, ",")})
 			return
 		}
 	case "all":

@@ -90,3 +90,13 @@ type AddReq struct {
 	PubkeyNum            int   `json:"pubkeyNum"`
 	AccessToken          string
 }
+
+type TmTxErrResult struct {
+	Jsonrpc string `json:"jsonrpc"`
+	Id      int    `json:"id"`
+	Error   struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+		Data    string `json:"data"`
+	} `json:"error"`
+}
