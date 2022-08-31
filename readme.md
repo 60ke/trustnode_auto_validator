@@ -13,7 +13,7 @@
     - ips: 目标ip地址列表
     - token: 服务端token
     - type: 添加ip类型:bsc/tm/all   bsc:bsc节点,tm:tm节点,all:bsc和tm节点
-    - action: 更新动作(暂时未使用):add/del  add:添加,del:删除
+    - action: 更新动作(del暂时未使用):add/del  add:添加,del:删除
 - 返回结果: 返回结果为json
     - 结果参数:
         - msg: 结果详情
