@@ -45,3 +45,6 @@
 
 [server]
   token = "3D3781351A3EE9E4"
+
+[tm-server]
+  ip = "210.73.218.171"

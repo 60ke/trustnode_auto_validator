@@ -18,9 +18,10 @@ type ServerConf struct {
 	Token string `toml:"token"`
 }
 type Config struct {
-	TM     []Host     `toml:"tm"`
-	BSC    []Host     `toml:"bsc"`
-	Server ServerConf `toml:"server"`
+	TM       []Host     `toml:"tm"`
+	BSC      []Host     `toml:"bsc"`
+	Server   ServerConf `toml:"server"`
+	TmServer string     `toml:"tm-server"`
 }
 
 func init() {
