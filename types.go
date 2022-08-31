@@ -95,8 +95,8 @@ type TmTxErrResult struct {
 	Jsonrpc string `json:"jsonrpc"`
 	Id      int    `json:"id"`
 	Error   struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Data    string `json:"data"`
-	} `json:"error"`
+		Code    int    `json:"code,omitempty"`
+		Message string `json:"message,omitempty"`
+		Data    string `json:"data,omitempty"`
+	} `json:"error,omitempty"`
 }
