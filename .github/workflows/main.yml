@@ -43,7 +43,7 @@ jobs:
       id: version
       env:
         TAG: ${{ github.head_ref }}
-      run: echo "::set-output name=version::${{ env.TAG }}"
+      run: echo "::set-output name=version::test"
     - name: Gets latest created release info
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
