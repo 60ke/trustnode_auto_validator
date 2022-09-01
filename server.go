@@ -106,16 +106,18 @@ func AddValidators(c *gin.Context) {
 	var bscfails []string
 	var tmfails []string
 	var err error
+	var bscErrs, tmErrs []error
 	switch ipdata.Type {
 	case "bsc":
 		for _, ip := range ipdata.IPs {
 			err = addBsc(ip)
 			if err != nil {
 				bscfails = append(bscfails, ip)
+				bscErrs = append(bscErrs, err)
 			}
 		}
 		if len(bscfails) != 0 {
-			c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addbsc failed: " + strings.Join(bscfails, ",")})
+			c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addbsc failed: " + strings.Join(bscfails, ","), "bscErrs": bscErrs})
 			return
 		}
 	case "tm":
@@ -124,38 +126,41 @@ func AddValidators(c *gin.Context) {
 			if err != nil {
 				Logger.Error("addTm err:", err)
 				tmfails = append(tmfails, ip)
+				tmErrs = append(tmErrs, err)
 			}
 		}
 		if len(tmfails) != 0 {
-			c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addtm failed: " + strings.Join(tmfails, ","), "err": err})
+			c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addtm failed: " + strings.Join(tmfails, ","), "tmErrs": tmErrs})
 			return
 		}
 	case "all":
+
 		for _, ip := range ipdata.IPs {
-			err = addBsc(ip)
-			if err != nil {
+			bscErr := addBsc(ip)
+			if bscErr != nil {
 				bscfails = append(bscfails, ip)
+				bscErrs = append(bscErrs, bscErr)
+			} else {
+				tmErr := addTm(ip)
+				if tmErr != nil {
+					tmfails = append(tmfails, ip)
+					tmErrs = append(tmErrs, tmErr)
+				}
 			}
 		}
 
-		for _, ip := range ipdata.IPs {
-			err = addTm(ip)
-			if err != nil {
-				tmfails = append(tmfails, ip)
-			}
-		}
 		if len(bscfails) != 0 {
 			if len(tmfails) == 0 {
-				c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addbsc failed: " + strings.Join(bscfails, ","), "err": err})
+				c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addbsc failed: " + strings.Join(bscfails, ","), "bscErrs": bscErrs})
 				return
 			} else {
-				c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addbsc failed: " + strings.Join(bscfails, ",") + "some ip addtm failed: " + strings.Join(tmfails, ","), "err": err})
+				c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addbsc failed: " + strings.Join(bscfails, ",") + "some ip addtm failed: " + strings.Join(tmfails, ","), "bscErrs": bscErrs, "tmErrs": tmErrs})
 				return
 			}
 
 		} else {
 			if len(tmfails) != 0 {
-				c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addtm failed: " + strings.Join(tmfails, ","), "err": err})
+				c.IndentedJSON(http.StatusOK, gin.H{"status": "failed", "msg": "some ip addtm failed: " + strings.Join(tmfails, ","), "tmErrs": tmErrs})
 				return
 			}
 		}
