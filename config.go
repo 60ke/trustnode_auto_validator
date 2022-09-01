@@ -10,18 +10,22 @@ import (
 var Conf Config
 
 type Host struct {
-	Ip    string `toml:"ip"`
-	IsNew bool   `toml:"isNew"`
+	Ip    string `toml:"ip" comment:"ip地址"`
+	IsNew bool   `toml:"isNew" comment:"用于确定是否为新加ip,默认为false,已弃用"`
+}
+
+type TmServerIP struct {
+	IP string `toml:"ip"`
 }
 
 type ServerConf struct {
-	Token string `toml:"token"`
+	Token string `toml:"token" comment:"bsc链server token"`
 }
 type Config struct {
-	TM       []Host     `toml:"tm"`
-	BSC      []Host     `toml:"bsc"`
-	Server   ServerConf `toml:"server"`
-	TmServer string     `toml:"tm-server"`
+	TM       []Host     `toml:"tm" comment:"tm链节点ip列表"`
+	BSC      []Host     `toml:"bsc" comment:"bsc链节点ip列表"`
+	Server   ServerConf `toml:"server" comment:"bsc链server配置"`
+	TmServer TmServerIP `toml:"tm-server" comment:"tm链server ip"`
 }
 
 func init() {
