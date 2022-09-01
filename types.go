@@ -1,6 +1,8 @@
 package main
 
-import "time"
+import (
+	"time"
+)
 
 type TmResult struct {
 	Jsonrpc string `json:"jsonrpc"`
@@ -99,4 +101,18 @@ type TmTxErrResult struct {
 		Message string `json:"message,omitempty"`
 		Data    string `json:"data,omitempty"`
 	} `json:"error,omitempty"`
+}
+
+type AddResult struct {
+	Status string          `json:"status"`
+	Msg    string          `json:"msg"`
+	Hosts  []AddHostResult `json:"hosts"`
+}
+
+type AddHostResult struct {
+	IP     string `json:"ip"`
+	AddTm  string `json:"add_tm,omitempty"`
+	AddBsc string `json:"add_bsc,omitempty"`
+	TmErr  string `json:"tmErr,omitempty"`
+	BscErr string `json:"bscErr,omitempty"`
 }
