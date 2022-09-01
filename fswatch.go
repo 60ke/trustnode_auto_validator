@@ -24,7 +24,7 @@ func watch() {
 				}
 				// Info("event:", event)
 				LoadConf()
-				Logger.Info("conf change to:", Conf.String())
+				Logger.Debug("conf change to:", Conf.String())
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
