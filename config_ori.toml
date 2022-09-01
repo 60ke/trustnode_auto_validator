@@ -19,21 +19,6 @@
   ip = "210.73.218.172"
   isNew = false
 
-[[tm]]
-  ip = "101.251.207.186"
-  isNew = false
-
-[[tm]]
-  ip = "101.251.207.187"
-  isNew = false
-
-[[tm]]
-  ip = "101.251.223.189"
-  isNew = false
-
-[[tm]]
-  ip = "101.251.223.190"
-  isNew = false
 
 [[bsc]]
   ip = "106.3.133.178"
@@ -55,21 +40,7 @@
   ip = "210.73.218.172"
   isNew = false
 
-[[bsc]]
-  ip = "101.251.207.186"
-  isNew = false
 
-[[bsc]]
-  ip = "101.251.207.187"
-  isNew = false
-
-[[bsc]]
-  ip = "101.251.223.189"
-  isNew = false
-
-[[bsc]]
-  ip = "101.251.223.190"
-  isNew = false
 
 [server]
   token = "3D3781351A3EE9E4"
