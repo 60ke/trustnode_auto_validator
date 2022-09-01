@@ -24,6 +24,18 @@
     --header 'Content-Type: application/json' \
     --data-raw '{"ips":["101.251.207.187"],"token":"3D3781351A3EE9E4","type":"bsc"}'
     ```
+- 添加tm节点的`curl`示例:
+    ```bash
+    curl --location --request POST '127.0.0.1:6667/add_validators' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{"ips":["101.251.207.187"],"token":"3D3781351A3EE9E4","type":"tm"}'
+    ```
+- 同时添加tm和bsc节点的`curl`示例:
+    ```bash
+    curl --location --request POST '127.0.0.1:6667/add_validators' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{"ips":["101.251.207.187"],"token":"3D3781351A3EE9E4","type":"all"}'
+    ```     
 > ips为待添加验证者节点ip地址列表,"127.0.0.1"为server ip
 ### 获取当前验证者
 
