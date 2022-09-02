@@ -213,8 +213,9 @@ func AddValidators(c *gin.Context) {
 }
 
 func GetValidators(c *gin.Context) {
-	ips, _ := GetIps("bsc")
-	c.IndentedJSON(http.StatusOK, gin.H{"status": Succ, "ips": ips})
+	bscIps, _ := GetIps("bsc")
+	tmIps, _ := GetIps("tm")
+	c.IndentedJSON(http.StatusOK, gin.H{"bsc": bscIps, "tm": tmIps})
 }
 
 func Server() {
