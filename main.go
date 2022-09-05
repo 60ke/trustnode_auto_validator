@@ -9,5 +9,6 @@ func main() {
 	// fmt.Println(ips)
 	// GenMap(ips)
 	go watch()
+	go GetLagNodes()
 	Server()
 }

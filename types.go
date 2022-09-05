@@ -4,7 +4,8 @@ import (
 	"time"
 )
 
-type TmResult struct {
+// tm状态返回结果:tri_status
+type TmSResponse struct {
 	Jsonrpc string `json:"jsonrpc"`
 	Id      int    `json:"id"`
 	Result  struct {
@@ -54,6 +55,21 @@ type TmResult struct {
 			} `json:"pub_key"`
 			VotingPower string `json:"voting_power"`
 		} `json:"validator_info"`
+	} `json:"result"`
+}
+
+// tm块高返回结果:tri_abci_info
+type TmHResponse struct {
+	Jsonrpc string `json:"jsonrpc"`
+	Id      int    `json:"id"`
+	Result  struct {
+		Response struct {
+			Data             string `json:"data"`
+			Version          string `json:"version"`
+			AppVersion       string `json:"app_version"`
+			LastBlockHeight  string `json:"last_block_height"`
+			LastBlockAppHash string `json:"last_block_app_hash"`
+		} `json:"response"`
 	} `json:"result"`
 }
 

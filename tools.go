@@ -57,7 +57,7 @@ func post(url string, payload *strings.Reader) ([]byte, error) {
 func GetTmAddr(ip string) (string, error) {
 	url := "http://" + ip + ":46657/tri_status?"
 
-	var ret TmResult
+	var ret TmSResponse
 	b, err := get(url)
 	if err != nil {
 		return "", err

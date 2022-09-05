@@ -21,11 +21,21 @@ type TmServerIP struct {
 type ServerConf struct {
 	Token string `toml:"token" comment:"bsc链server token"`
 }
+
+type Monitor struct {
+	DingUrl       string   `toml:"ding-url" comment:"钉钉机器人接口"`
+	PrefixKey     string   `toml:"prefix-key" comment:"钉钉安全,消息前缀"`
+	Interval      int      `toml:"interval" comment:"获取块高时间间隔,单位为秒"`
+	RetryTimes    int      `toml:"retry-times" comment:"判断区块落后所需次数"`
+	AbnormalHosts []string `toml:"abnormal-hosts" comment:"落后区块节点ip列表"`
+}
+
 type Config struct {
 	TM       []Host     `toml:"tm" comment:"tm链节点ip列表"`
 	BSC      []Host     `toml:"bsc" comment:"bsc链节点ip列表"`
 	Server   ServerConf `toml:"server" comment:"bsc链server配置"`
 	TmServer TmServerIP `toml:"tm-server" comment:"tm链server ip"`
+	Monitor  Monitor    `toml:"monitor" comment:"tm落后节点监视器"`
 }
 
 func init() {

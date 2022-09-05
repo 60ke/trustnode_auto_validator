@@ -76,3 +76,9 @@
 
 [tm-server]
   ip = "210.73.218.171"
+[monitor]
+  ding-url = "https://oapi.dingtalk.com/robot/send?access_token=cf2758d4b768f7aa352a919c72f88e9e9fd695168147f851c38c7a78d92cbd69"
+  prefix-key = "tm异常:"
+  interval = 5
+  retry-times = 5
+  abnormal-hosts = []
