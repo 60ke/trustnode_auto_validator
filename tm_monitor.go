@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -25,12 +24,41 @@ type ChResult struct {
 
 type LagNodes map[string]int
 
-type Text struct {
-	Content string `json:"content"`
+type TmErrHost struct {
+	Title         string
+	IP            string
+	LocalHeight   int64
+	ClusterHeight int64
 }
-type DingMsg struct {
+type Text struct {
+	Content []TmErrHost `json:"content"`
+}
+type DingTmMsg struct {
 	MsgType string `json:"msgtype"`
 	Text    Text   `json:"text"`
+}
+
+func GetTmHeight(ip string) (int64, error) {
+
+	var res TmHResponse
+	url := "http://" + ip + ":46657/tri_abci_info"
+	r, err := get(url)
+	if err != nil {
+		return 0, err
+	}
+	err = json.Unmarshal(r, &res)
+	if err != nil {
+		return 0, err
+	}
+	if res.Result.Response.LastBlockHeight == "" {
+		res.Result.Response.LastBlockHeight = "0"
+	}
+	h, err := strconv.ParseInt(res.Result.Response.LastBlockHeight, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return h, nil
+
 }
 
 func GetTmsHStatus() (TmsHStatus, error) {
@@ -41,28 +69,10 @@ func GetTmsHStatus() (TmsHStatus, error) {
 	results := make(chan ChResult, len(tmIps))
 	for _, tmIp := range tmIps {
 		go func(ip string) {
-			var res TmHResponse
-
 			var chResult ChResult
 			chResult.T.Ip = ip
-			url := "http://" + ip + ":46657/tri_abci_info"
-			r, err := get(url)
-			if err != nil {
-				chResult.Err = err
-				results <- chResult
-				return
-			}
-			err = json.Unmarshal(r, &res)
-			if err != nil {
-				Logger.Error(err)
-				chResult.Err = err
-				results <- chResult
-				return
-			}
-			if res.Result.Response.LastBlockHeight == "" {
-				res.Result.Response.LastBlockHeight = "0"
-			}
-			h, err := strconv.ParseInt(res.Result.Response.LastBlockHeight, 10, 64)
+
+			h, err := GetTmHeight(ip)
 			if err != nil {
 				Logger.Error(err)
 				chResult.Err = err
@@ -129,10 +139,28 @@ func getNewAbnormals(lastAbnormals, abnormals []string) []string {
 }
 
 // 发送钉钉通知
-func sendMsg(url, prefix, content string) {
-	Logger.Info("sendMsg:", content)
-	payload := strings.NewReader(fmt.Sprintf(`{"msgtype": "text","text": {"content":"%s"}}`, prefix+content))
+func sendTmMsg(url, prefix, content string) {
+	Logger.Info("sendTmMsg:", content)
+	payload := strings.NewReader(content)
 	post(url, payload)
+}
+
+// 获取正常的节点ip
+func getNormal(ips []string) string {
+	tmIps, _ := GetIps("tm")
+	for _, tmIp := range tmIps {
+		in := false
+		for _, ip := range ips {
+			if tmIp == ip {
+				in = true
+			}
+		}
+		if !in {
+			return tmIp
+		}
+	}
+	Logger.Error("cant get abnormal ip")
+	return ""
 }
 
 // 获取落后节点
@@ -164,8 +192,22 @@ func GetLagNodes() {
 		Conf.Monitor.AbnormalHosts = abnormals
 		SaveConf(Conf)
 		newAbnormals := getNewAbnormals(lastAbnormals, abnormals)
+		normalIp := getNormal(abnormals)
+		clusterHeight, _ := GetTmHeight(normalIp)
 		if len(newAbnormals) != 0 {
-			sendMsg(url, prefix, strings.Join(newAbnormals, ","))
+			var msg DingTmMsg
+			msg.MsgType = "text"
+			for _, ip := range newAbnormals {
+				var host TmErrHost
+				localHeight, _ := GetTmHeight(ip)
+				host.ClusterHeight = clusterHeight
+				host.LocalHeight = localHeight
+				host.IP = ip
+				host.Title = prefix
+				msg.Text.Content = append(msg.Text.Content, host)
+			}
+			content, _ := json.Marshal(msg)
+			sendTmMsg(url, prefix, string(content))
 		}
 
 		times = 0
