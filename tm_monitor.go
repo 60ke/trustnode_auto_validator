@@ -71,7 +71,7 @@ func GetTmsHStatus() (TmsHStatus, error) {
 			tms.Hosts = append(tms.Hosts, result.T)
 		}
 	}
-
+	close(results)
 	return tms, nil
 }
 
