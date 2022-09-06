@@ -52,9 +52,19 @@ func GetTmsHStatus() (TmsHStatus, error) {
 				results <- chResult
 				return
 			}
-			json.Unmarshal(r, &res)
+			err = json.Unmarshal(r, &res)
+			if err != nil {
+				Logger.Error(err)
+				chResult.Err = err
+				results <- chResult
+				return
+			}
+			if res.Result.Response.LastBlockHeight == "" {
+				res.Result.Response.LastBlockHeight = "0"
+			}
 			h, err := strconv.ParseInt(res.Result.Response.LastBlockHeight, 10, 64)
 			if err != nil {
+				Logger.Error(err)
 				chResult.Err = err
 				results <- chResult
 				return
@@ -67,7 +77,8 @@ func GetTmsHStatus() (TmsHStatus, error) {
 
 	for i := 0; i < len(tmIps); i++ {
 		result := <-results
-		if result.Err != nil {
+		Logger.Debug(result)
+		if result.Err == nil {
 			tms.Hosts = append(tms.Hosts, result.T)
 		}
 	}
@@ -90,12 +101,14 @@ func getLagNodes(lagNodes LagNodes) LagNodes {
 	if err != nil {
 		Logger.Error(err)
 	}
+	Logger.Info(tms)
 	maxH := getMaxH(tms)
 	for _, host := range tms.Hosts {
 		if host.Height < maxH {
 			lagNodes[host.Ip] += 1
 		}
 	}
+	Logger.Info(lagNodes)
 	return lagNodes
 }
 
@@ -117,6 +130,7 @@ func getNewAbnormals(lastAbnormals, abnormals []string) []string {
 
 // 发送钉钉通知
 func sendMsg(url, prefix, content string) {
+	Logger.Info("sendMsg:", content)
 	payload := strings.NewReader(fmt.Sprintf(`{"msgtype": "text","text": {"content":"%s"}}`, prefix+content))
 	post(url, payload)
 }
@@ -134,21 +148,20 @@ func GetLagNodes() {
 		retry := Conf.Monitor.RetryTimes
 		prefix := Conf.Monitor.PrefixKey
 		url := Conf.Monitor.DingUrl
-		var lagNodes LagNodes
+		var lagNodes = make(LagNodes)
 		Logger.Info(interval, retry, prefix, url)
 		for times < retry {
 			lagNodes = getLagNodes(lagNodes)
 			time.Sleep(time.Duration(interval) * time.Second)
 			times += 1
 		}
-		Logger.Info("")
 		for ip, timesInt := range lagNodes {
+			Logger.Info(ip, timesInt)
 			if timesInt == retry {
 				abnormals = append(abnormals, ip)
 			}
 		}
 		Conf.Monitor.AbnormalHosts = abnormals
-		Logger.Info("")
 		SaveConf(Conf)
 		newAbnormals := getNewAbnormals(lastAbnormals, abnormals)
 		if len(abnormals) != 0 {
