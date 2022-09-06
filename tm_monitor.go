@@ -164,7 +164,7 @@ func GetLagNodes() {
 		Conf.Monitor.AbnormalHosts = abnormals
 		SaveConf(Conf)
 		newAbnormals := getNewAbnormals(lastAbnormals, abnormals)
-		if len(abnormals) != 0 {
+		if len(newAbnormals) != 0 {
 			sendMsg(url, prefix, strings.Join(newAbnormals, ","))
 		}
 
