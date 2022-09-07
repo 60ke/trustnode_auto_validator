@@ -218,7 +218,7 @@ func GetValidators(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"bsc": bscIps, "tm": tmIps})
 }
 
-func Server() {
+func NodeUpdateServer() {
 	fmt.Printf("Version: %s\n", Version)
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()

@@ -4,11 +4,8 @@ package main
 
 func main() {
 
-	// LoadConf()
-	// ips := GetIps()
-	// fmt.Println(ips)
-	// GenMap(ips)
-	go watch()
-	go GetLagNodes()
-	Server()
+	// go ConfigWatch()
+	go TMWatch()
+	go BscWatch()
+	NodeUpdateServer()
 }

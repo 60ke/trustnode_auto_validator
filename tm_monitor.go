@@ -7,32 +7,40 @@ import (
 	"time"
 )
 
-type TmH struct {
+// 节点块高
+type NodeH struct {
 	Height int64
 	Ip     string
 }
 
-// tm集群的块高状态
-type TmsHStatus struct {
-	Hosts []TmH
+// 集群的块高状态
+type ClusterHStatus struct {
+	Nodes []NodeH
 }
 
+// 获取节点块高,channel返回结果
 type ChResult struct {
-	T   TmH
+	H   NodeH
 	Err error
 }
 
+// 落后节点map
 type LagNodes map[string]int
 
-type TmErrHost struct {
+// 高度错误节点
+type HeightErrHost struct {
 	Title         string
 	IP            string
 	LocalHeight   int64
 	ClusterHeight int64
 }
+
+// 钉钉通知text
 type Text struct {
-	Content []TmErrHost `json:"content"`
+	Content []HeightErrHost `json:"content"`
 }
+
+// 钉钉通知消息
 type DingTmMsg struct {
 	MsgType string `json:"msgtype"`
 	Text    Text   `json:"text"`
@@ -61,16 +69,16 @@ func GetTmHeight(ip string) (int64, error) {
 
 }
 
-func GetTmsHStatus() (TmsHStatus, error) {
-	var tms TmsHStatus
+func GetClusterHStatus(nodeType string) (ClusterHStatus, error) {
+	var cluster ClusterHStatus
 
-	tmIps, _ := GetIps("tm")
-	Logger.Info(tmIps)
-	results := make(chan ChResult, len(tmIps))
-	for _, tmIp := range tmIps {
+	ips, _ := GetIps(nodeType)
+	Logger.Info("tm ip list :", ips)
+	results := make(chan ChResult, len(ips))
+	for _, tmIp := range ips {
 		go func(ip string) {
 			var chResult ChResult
-			chResult.T.Ip = ip
+			chResult.H.Ip = ip
 
 			h, err := GetTmHeight(ip)
 			if err != nil {
@@ -79,26 +87,26 @@ func GetTmsHStatus() (TmsHStatus, error) {
 				results <- chResult
 				return
 			}
-			chResult.T.Height = h
-			Logger.Infof("tmHeight: %s:%d", chResult.T.Ip, chResult.T.Height)
+			chResult.H.Height = h
+			Logger.Infof("tmHeight: %s:%d", chResult.H.Ip, chResult.H.Height)
 			results <- chResult
 		}(tmIp)
 	}
 
-	for i := 0; i < len(tmIps); i++ {
+	for i := 0; i < len(ips); i++ {
 		result := <-results
 		Logger.Debug(result)
 		if result.Err == nil {
-			tms.Hosts = append(tms.Hosts, result.T)
+			cluster.Nodes = append(cluster.Nodes, result.H)
 		}
 	}
 	close(results)
-	return tms, nil
+	return cluster, nil
 }
 
-func getMaxH(tms TmsHStatus) int64 {
+func getMaxH(tms ClusterHStatus) int64 {
 	var max int64
-	for _, host := range tms.Hosts {
+	for _, host := range tms.Nodes {
 		if host.Height > max {
 			max = host.Height
 		}
@@ -106,14 +114,15 @@ func getMaxH(tms TmsHStatus) int64 {
 	return max
 }
 
-func getLagNodes(lagNodes LagNodes) LagNodes {
-	tms, err := GetTmsHStatus()
+// 获取落后节点
+func getLagNodes(lagNodes LagNodes, nodeType string) LagNodes {
+	tms, err := GetClusterHStatus(nodeType)
 	if err != nil {
 		Logger.Error(err)
 	}
 	Logger.Info(tms)
 	maxH := getMaxH(tms)
-	for _, host := range tms.Hosts {
+	for _, host := range tms.Nodes {
 		if host.Height < maxH {
 			lagNodes[host.Ip] += 1
 		}
@@ -122,6 +131,7 @@ func getLagNodes(lagNodes LagNodes) LagNodes {
 	return lagNodes
 }
 
+// 获取新的异常节点列表
 func getNewAbnormals(lastAbnormals, abnormals []string) []string {
 	var newAbnormals []string
 	for _, ip := range abnormals {
@@ -138,25 +148,48 @@ func getNewAbnormals(lastAbnormals, abnormals []string) []string {
 	return newAbnormals
 }
 
+func GetHeight(nodeType, ip string) (int64, error) {
+	if nodeType == "tm" {
+		return GetTmHeight(ip)
+	}
+	return GetBscHeight(ip)
+}
+
+func GenMsg(errNodes []string, nodeType, msgPrefix string, clusterHeight int64) string {
+	var msg DingTmMsg
+	msg.MsgType = "text"
+	for _, ip := range errNodes {
+		var host HeightErrHost
+		localHeight, _ := GetHeight(nodeType, ip)
+		host.ClusterHeight = clusterHeight
+		host.LocalHeight = localHeight
+		host.IP = ip
+		host.Title = msgPrefix
+		msg.Text.Content = append(msg.Text.Content, host)
+	}
+	content, _ := json.Marshal(msg)
+	return string(content)
+}
+
 // 发送钉钉通知
-func sendTmMsg(url, prefix, content string) {
-	Logger.Info("sendTmMsg:", content)
+func sendMsg(url, prefix, nodeType, content string) {
+	Logger.Info("send", nodeType, "Msg:", content)
 	payload := strings.NewReader(content)
 	post(url, payload)
 }
 
 // 获取正常的节点ip
-func getNormal(ips []string) string {
-	tmIps, _ := GetIps("tm")
-	for _, tmIp := range tmIps {
+func getNormal(ips []string, nodeType string) string {
+	cluster, _ := GetIps(nodeType)
+	for _, node := range cluster {
 		in := false
 		for _, ip := range ips {
-			if tmIp == ip {
+			if node == ip {
 				in = true
 			}
 		}
 		if !in {
-			return tmIp
+			return node
 		}
 	}
 	Logger.Error("cant get abnormal ip")
@@ -164,22 +197,22 @@ func getNormal(ips []string) string {
 }
 
 // 获取落后节点
-func GetLagNodes() {
+func TMWatch() {
 	// 先从配置中读取
 	for {
 		times := 0
-
+		nodeType := "tm"
 		var abnormals []string
 		// 读取旧的异常ip列表
-		lastAbnormals := Conf.Monitor.AbnormalHosts
-		interval := Conf.Monitor.Interval
-		retry := Conf.Monitor.RetryTimes
-		prefix := Conf.Monitor.PrefixKey
-		url := Conf.Monitor.DingUrl
+		lastAbnormals := Conf.TmMonitor.AbnormalHosts
+		interval := Conf.TmMonitor.Interval
+		retry := Conf.TmMonitor.RetryTimes
+		prefix := Conf.TmMonitor.PrefixKey
+		url := Conf.TmMonitor.DingUrl
 		var lagNodes = make(LagNodes)
 		Logger.Info(interval, retry, prefix, url)
 		for times < retry {
-			lagNodes = getLagNodes(lagNodes)
+			lagNodes = getLagNodes(lagNodes, nodeType)
 			time.Sleep(time.Duration(interval) * time.Second)
 			times += 1
 		}
@@ -189,25 +222,14 @@ func GetLagNodes() {
 				abnormals = append(abnormals, ip)
 			}
 		}
-		Conf.Monitor.AbnormalHosts = abnormals
+		Conf.TmMonitor.AbnormalHosts = abnormals
 		SaveConf(Conf)
 		newAbnormals := getNewAbnormals(lastAbnormals, abnormals)
-		normalIp := getNormal(abnormals)
+		normalIp := getNormal(abnormals, nodeType)
 		clusterHeight, _ := GetTmHeight(normalIp)
 		if len(newAbnormals) != 0 {
-			var msg DingTmMsg
-			msg.MsgType = "text"
-			for _, ip := range newAbnormals {
-				var host TmErrHost
-				localHeight, _ := GetTmHeight(ip)
-				host.ClusterHeight = clusterHeight
-				host.LocalHeight = localHeight
-				host.IP = ip
-				host.Title = prefix
-				msg.Text.Content = append(msg.Text.Content, host)
-			}
-			content, _ := json.Marshal(msg)
-			sendTmMsg(url, prefix, string(content))
+			content := GenMsg(newAbnormals, nodeType, prefix, clusterHeight)
+			sendMsg(url, prefix, nodeType, content)
 		}
 
 		times = 0

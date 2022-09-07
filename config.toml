@@ -106,7 +106,7 @@
   ip = "210.73.218.171"
 
 # tm落后节点监视器
-[monitor]
+[tm-monitor]
 
   # 钉钉机器人接口
   ding-url = "https://oapi.dingtalk.com/robot/send?access_token=cf2758d4b768f7aa352a919c72f88e9e9fd695168147f851c38c7a78d92cbd69"
@@ -116,6 +116,24 @@
 
   # 获取块高时间间隔,单位为秒
   interval = 5
+
+  # 判断区块落后所需次数
+  retry-times = 5
+
+  # 落后区块节点ip列表
+  abnormal-hosts = []
+
+# bsc节点停止出块监视
+[bsc-monitor]
+
+  # 钉钉机器人接口
+  ding-url = "https://oapi.dingtalk.com/robot/send?access_token=cf2758d4b768f7aa352a919c72f88e9e9fd695168147f851c38c7a78d92cbd69"
+
+  # 钉钉安全,消息前缀
+  prefix-key = "bsc节点停止出块"
+
+  # 获取块高时间间隔,单位为秒
+  interval = 10
 
   # 判断区块落后所需次数
   retry-times = 5

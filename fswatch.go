@@ -6,7 +6,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-func watch() {
+func ConfigWatch() {
 	// Create new watcher.
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {

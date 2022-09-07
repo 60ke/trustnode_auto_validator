@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/pelletier/go-toml"
 )
@@ -31,11 +32,12 @@ type Monitor struct {
 }
 
 type Config struct {
-	TM       []Host     `toml:"tm" comment:"tm链节点ip列表"`
-	BSC      []Host     `toml:"bsc" comment:"bsc链节点ip列表"`
-	Server   ServerConf `toml:"server" comment:"bsc链server配置"`
-	TmServer TmServerIP `toml:"tm-server" comment:"tm链server ip"`
-	Monitor  Monitor    `toml:"monitor" comment:"tm落后节点监视器"`
+	TM         []Host     `toml:"tm" comment:"tm链节点ip列表"`
+	BSC        []Host     `toml:"bsc" comment:"bsc链节点ip列表"`
+	Server     ServerConf `toml:"server" comment:"bsc链server配置"`
+	TmServer   TmServerIP `toml:"tm-server" comment:"tm链server ip"`
+	TmMonitor  Monitor    `toml:"tm-monitor" comment:"tm落后节点监视器"`
+	BscMonitor Monitor    `toml:"bsc-monitor" comment:"bsc节点停止出块监视"`
 }
 
 func init() {
@@ -50,6 +52,9 @@ func LoadConf() *Config {
 }
 
 func SaveConf(conf Config) error {
+	var mu sync.Mutex
+	mu.Lock()
+	defer mu.Unlock()
 	f, err := os.Create("./config.toml")
 	if err != nil {
 		Logger.Error(err)
@@ -63,7 +68,6 @@ func SaveConf(conf Config) error {
 	if err = enc.Encode(conf); err != nil {
 		return err
 	}
-
 	return nil
 }
 
