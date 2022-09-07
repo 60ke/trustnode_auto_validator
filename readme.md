@@ -73,3 +73,7 @@ curl 127.0.0.1:6667/get_validators
     tm链server配置,包含一个`ip`字段:
     
         - ip : ip地址
+
+
+## 其它
+对于新增的节点,bsc从创世块同步时,trustconfig需配置为5个,待同步至最新的区块时,trustconfig不会自动更新,当前需要手动修改使其与其它节点一致.
