@@ -109,7 +109,7 @@
 [tm-monitor]
 
   # 钉钉机器人接口
-  ding-url = "https://oapi.dingtalk.com/robot/send?access_token=cf2758d4b768f7aa352a919c72f88e9e9fd695168147f851c38c7a78d92cbd69"
+  ding-url = "https://oapi.dingtalk.com/robot/send?access_token=a3a04a0a624789bf546dfa634e25b7e0af585db20d4a39d9dbf63378dcb22444"
 
   # 钉钉安全设置,节点正常消息前缀
   ok-prefix-key = "tm节点恢复正常"
@@ -130,7 +130,7 @@
 [bsc-monitor]
 
   # 钉钉机器人接口
-  ding-url = "https://oapi.dingtalk.com/robot/send?access_token=cf2758d4b768f7aa352a919c72f88e9e9fd695168147f851c38c7a78d92cbd69"
+  ding-url = "https://oapi.dingtalk.com/robot/send?access_token=a3a04a0a624789bf546dfa634e25b7e0af585db20d4a39d9dbf63378dcb22444"
 
   # 钉钉安全设置,节点正常消息前缀
   ok-prefix-key = "bsc节点恢复正常"
