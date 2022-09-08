@@ -51,28 +51,7 @@ curl 127.0.0.1:6667/get_validators
 
 ### 配置
 配置文件为当前路径下的`config.toml`文件.`config_ori.toml`为项目的原始(默认)配置文件,有5个验证者.当验证者重置为5个验证者时,`config.toml`文件内容应与`config_ori.toml`一致.
-- [[tm]]
-
-    tm链节点配置列表,包含`ip`与`isNew`两个字段
-
-        - ip : ip地址
-        - isNew : 用于确定是否为新加ip,默认为false,已弃用
-- [[bsc]]
-
-    bsc链节点配置列表,包含`ip`与`isNew`两个字段
-
-        - ip : ip地址
-        - isNew : 用于确定是否为新加ip,默认为false,已弃用
-- [server]
-
-    bsc链server配置,包含一个`token`字段:
-
-        - token : bsc链server token
-- [tm-server]
-
-    tm链server配置,包含一个`ip`字段:
-    
-        - ip : ip地址
+相关配置说明以`config_ori.toml`注释为准
 
 
 ## 其它
