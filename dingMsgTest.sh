@@ -1,0 +1,1 @@
+curl 'https://oapi.dingtalk.com/robot/send?access_token=cf2758d4b768f7aa352a919c72f88e9e9fd695168147f851c38c7a78d92cbd69' -H 'Content-Type: application/json'  -d '{"msgtype":"text","text":{"content":[{"title":"bsc节点恢复正常","IP":"101.251.223.190","LocalHeight":0,"ClusterHeight":11718}]}}'
