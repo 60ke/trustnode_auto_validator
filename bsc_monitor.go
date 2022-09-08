@@ -58,7 +58,7 @@ func BscNodeWatch(ip string, interval, retry int) BscNodeStatus {
 		return bscNodeStatus
 	}
 	bscNodeStatus.Height = oldH
-	times := 1
+	times := 0
 
 	for times < retry {
 		newH, _ := GetBscHeight(ip)
