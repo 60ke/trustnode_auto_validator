@@ -139,7 +139,7 @@
   err-prefix-key = "bsc节点异常"
 
   # 获取块高时间间隔,单位为秒
-  interval = 10
+  interval = 15
 
   # 判断区块落后所需次数
   retry-times = 5
