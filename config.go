@@ -25,7 +25,8 @@ type ServerConf struct {
 
 type Monitor struct {
 	DingUrl       string   `toml:"ding-url" comment:"钉钉机器人接口"`
-	PrefixKey     string   `toml:"prefix-key" comment:"钉钉安全,消息前缀"`
+	OkPrefixKey   string   `toml:"ok-prefix-key" comment:"钉钉安全设置,节点正常消息前缀"`
+	ErrPrefixKey  string   `toml:"err-prefix-key" comment:"钉钉安全设置,节点异常消息前缀"`
 	Interval      int      `toml:"interval" comment:"获取块高时间间隔,单位为秒"`
 	RetryTimes    int      `toml:"retry-times" comment:"判断区块落后所需次数"`
 	AbnormalHosts []string `toml:"abnormal-hosts" comment:"落后区块节点ip列表"`

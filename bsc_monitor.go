@@ -41,7 +41,7 @@ func GetBscHeight(ip string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	Logger.Infof("bscHeight: %s:%d", ip, h)
+	Logger.Debugf("bscHeight: %s:%d", ip, h)
 	return h, nil
 
 }
@@ -50,16 +50,16 @@ func BscNodeWatch(ip string, interval, retry int) BscNodeStatus {
 	var bscNodeStatus BscNodeStatus
 	bscNodeStatus.Increase = false
 	bscNodeStatus.Ip = ip
+	start := time.Now()
 	oldH, err := GetBscHeight(ip)
 	if err != nil {
 		Logger.Error(err)
 		bscNodeStatus.Err = err
+		return bscNodeStatus
 	}
 	bscNodeStatus.Height = oldH
 	times := 1
-	if err != nil {
-		Logger.Error(err)
-	}
+
 	for times < retry {
 		newH, _ := GetBscHeight(ip)
 		if newH > oldH {
@@ -69,6 +69,7 @@ func BscNodeWatch(ip string, interval, retry int) BscNodeStatus {
 		time.Sleep(time.Duration(interval) * time.Second)
 		times += 1
 	}
+	Logger.Infof("bsc节点:%s,%ds内未出新快,块高:%d", ip, int(time.Since(start).Seconds()), oldH)
 	return bscNodeStatus
 
 }
@@ -78,18 +79,19 @@ func BscWatch() {
 		nodeType := "bsc"
 		interval := Conf.BscMonitor.Interval
 		retry := Conf.BscMonitor.RetryTimes
-		prefix := Conf.BscMonitor.PrefixKey
+		errPrefix := Conf.BscMonitor.ErrPrefixKey
+		okPrefix := Conf.BscMonitor.OkPrefixKey
 		url := Conf.BscMonitor.DingUrl
 
 		var abnormals []string
 		// 读取旧的异常ip列表
 		lastAbnormals := Conf.BscMonitor.AbnormalHosts
 
-		var msg DingTmMsg
+		var msg DingErrMsg
 		msg.MsgType = "text"
 
 		ips, _ := GetIps("bsc")
-		Logger.Info("bsc ip list", ips)
+		Logger.Debug("bsc ip list", ips)
 
 		results := make(chan BscNodeStatus, len(ips))
 		for _, ip := range ips {
@@ -109,11 +111,27 @@ func BscWatch() {
 		Conf.BscMonitor.AbnormalHosts = abnormals
 		SaveConf(Conf)
 		newAbnormals := getNewAbnormals(lastAbnormals, abnormals)
-		normalIp := getNormal(abnormals, "bsc")
+		okNodes := getOknodes(lastAbnormals, abnormals)
+
+		// 通知恢复正常的节点
+		if len(okNodes) != 0 {
+			okContent := GenOkMsg(okNodes, nodeType, okPrefix)
+			sendMsg(url, nodeType, okContent)
+		}
+
+		// 通知所有节点恢复正常
+		if len(abnormals) == 0 {
+			if len(lastAbnormals) > 0 {
+				okContent := GenOkMsg(nil, nodeType, okPrefix)
+				sendMsg(url, nodeType, okContent)
+			}
+		}
+
+		normalIp := getNormal(abnormals, nodeType)
 		clusterHeight, _ := GetBscHeight(normalIp)
 		if len(newAbnormals) != 0 {
-			content := GenMsg(newAbnormals, nodeType, prefix, clusterHeight)
-			sendMsg(url, prefix, nodeType, content)
+			content := GenErrMsg(newAbnormals, nodeType, errPrefix, clusterHeight)
+			sendMsg(url, nodeType, content)
 		}
 
 	}

@@ -111,8 +111,11 @@
   # 钉钉机器人接口
   ding-url = "https://oapi.dingtalk.com/robot/send?access_token=cf2758d4b768f7aa352a919c72f88e9e9fd695168147f851c38c7a78d92cbd69"
 
-  # 钉钉安全,消息前缀
-  prefix-key = "tm异常"
+  # 钉钉安全设置,节点正常消息前缀
+  ok-prefix-key = "tm节点恢复正常"
+
+  # 钉钉安全设置,节点异常消息前缀
+  err-prefix-key = "tm节点异常"
 
   # 获取块高时间间隔,单位为秒
   interval = 5
@@ -129,8 +132,11 @@
   # 钉钉机器人接口
   ding-url = "https://oapi.dingtalk.com/robot/send?access_token=cf2758d4b768f7aa352a919c72f88e9e9fd695168147f851c38c7a78d92cbd69"
 
-  # 钉钉安全,消息前缀
-  prefix-key = "bsc节点停止出块"
+  # 钉钉安全设置,节点正常消息前缀
+  ok-prefix-key = "bsc节点恢复正常"
+
+  # 钉钉安全设置,节点异常消息前缀
+  err-prefix-key = "bsc节点异常"
 
   # 获取块高时间间隔,单位为秒
   interval = 10
