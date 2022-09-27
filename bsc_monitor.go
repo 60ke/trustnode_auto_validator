@@ -104,7 +104,7 @@ func BscWatch() {
 		for i := 0; i < len(ips); i++ {
 			result := <-results
 			Logger.Debug(result)
-			if !result.Increase && result.Err == nil {
+			if !result.Increase {
 				abnormals = append(abnormals, result.Ip)
 			}
 		}

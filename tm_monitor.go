@@ -112,9 +112,9 @@ func GetClusterHStatus(nodeType string) (ClusterHStatus, error) {
 	for i := 0; i < len(ips); i++ {
 		result := <-results
 		Logger.Debug(result)
-		if result.Err == nil {
-			cluster.Nodes = append(cluster.Nodes, result.H)
-		}
+
+		cluster.Nodes = append(cluster.Nodes, result.H)
+
 	}
 	close(results)
 	return cluster, nil
