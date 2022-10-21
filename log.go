@@ -19,7 +19,7 @@ func init() {
 		getLogWriter(),
 	)
 	encoder := getEncoder()
-	core := zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
+	core := zapcore.NewCore(encoder, writeSyncer, zapcore.InfoLevel)
 	Logger = zap.New(core, zap.AddCaller()).Sugar()
 }
 
